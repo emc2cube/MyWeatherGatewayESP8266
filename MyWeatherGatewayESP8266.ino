@@ -1,15 +1,15 @@
 /**
- * Important: I2C setup and NRF24L01 wiring
- * By default the NRF24 CE pin is wired on GPIO4. On ESP8266 default SDA and SCL pin are respectively GPIO4 and GPIO5.
- * Both CE pin and SDA (or even SCL) can be moved so depending of your setup you will have to move at least one of these.
- * Look for "#define MY_RF24_CE_PIN", "#define SDA" and "#define SCL" lines to adapt to your wiring.
- *
- * By default Adafruit BME280 library is looking for a BME280 sensor on the I2C bus at (0x77).
- * If your sensor is set with the low adress (0x76) you can uncomment the lines "#undef BME280_ADDRESS" and "#define BME280_ADDRESS (0x76)"
- * Or you can set it on high by changing the jumper/bridge setting on the PCB.
- *
- * Make sure to fill in your ssid and WiFi password below for ssid & pass.
- */
+   Important: I2C setup and NRF24L01 wiring
+   By default the NRF24 CE pin is wired on GPIO4. On ESP8266 default SDA and SCL pin are respectively GPIO4 and GPIO5.
+   Both CE pin and SDA (or even SCL) can be moved so depending of your setup you will have to move at least one of these.
+   Look for "#define MY_RF24_CE_PIN", "#define SDA" and "#define SCL" lines to adapt to your wiring.
+
+   By default Adafruit BME280 library is looking for a BME280 sensor on the I2C bus at (0x77).
+   If your sensor is set with the low adress (0x76) you can uncomment the lines "#undef BME280_ADDRESS" and "#define BME280_ADDRESS (0x76)"
+   Or you can set it on high by changing the jumper/bridge setting on the PCB.
+
+   Make sure to fill in your ssid and WiFi password below for ssid & pass.
+*/
 
 // ----------------------------------------------------------------------------
 // MySensor ESP8266 Gateway configuration
@@ -47,14 +47,14 @@
 #define MY_IP_GATEWAY_ADDRESS 192,168,178,1
 #define MY_IP_SUBNET_ADDRESS 255,255,255,0
 
-// The port to keep open on node server mode 
+// The port to keep open on node server mode
 #define MY_PORT 5003
 
 // How many clients should be able to connect to this gateway (default 1)
 #define MY_GATEWAY_MAX_CLIENTS 2
 
-// Controller ip address. Enables client mode (default is "server" mode). 
-// Also enable this if MY_USE_UDP is used and you want sensor data sent somewhere. 
+// Controller ip address. Enables client mode (default is "server" mode).
+// Also enable this if MY_USE_UDP is used and you want sensor data sent somewhere.
 //#define MY_CONTROLLER_IP_ADDRESS 192, 168, 178, 68
 
 // Enable inclusion mode
@@ -67,7 +67,7 @@
 // Digital pin used for inclusion mode button
 #define MY_INCLUSION_MODE_BUTTON_PIN  3
 
- 
+
 // Flash leds on rx/tx/err
 // #define MY_LEDS_BLINKING_FEATURE
 // Set blinking period
@@ -79,9 +79,9 @@
 #define MY_DEFAULT_TX_LED_PIN  16  // the PCB, on board LED
 
 #if defined(MY_USE_UDP)
-  #include <WiFiUDP.h>
+#include <WiFiUDP.h>
 #else
-  #include <ESP8266WiFi.h>
+#include <ESP8266WiFi.h>
 #endif
 
 #include <MySensor.h>
@@ -151,7 +151,7 @@ enum WEATHER_SITUATION
 {
   VERY_LOW_PRESSURE = 0,   // p > -7.5hPa
   LOW_PRESSURE = 1,        // p > -2.5hPa
-  NORMAL_PRESSURE = 2,     // p < +/-2.5hPa  
+  NORMAL_PRESSURE = 2,     // p < +/-2.5hPa
   HIGH_PRESSURE = 3,       // p > +2.5hPa
   VERY_HIGH_PRESSURE = 4,  // p > +7.5hPa
 };
@@ -166,7 +166,7 @@ const int LAST_SAMPLES_COUNT = 5;
 float lastPressureSamples[LAST_SAMPLES_COUNT];
 
 // this CONVERSION_FACTOR is used to convert from Pa to kPa in the forecast algorithm
-// get kPa/h by dividing hPa by 10 
+// get kPa/h by dividing hPa by 10
 #define CONVERSION_FACTOR (1.0/10.0)
 
 int minuteCount = 0;
@@ -189,16 +189,16 @@ MyMessage forecastMsg2(BARO_CHILD, V_VAR2);
 void initPressureSensor() {
   Serial.print(F("NRF24L01+ CE pin on GPIO"));
   Serial.println(MY_RF24_CE_PIN);
-  #if defined(SDA) && defined(SCL)
-    Serial.print(F("Using custom I2C pins: SDA on GPIO"));
-    Serial.print(SDA);
-    Serial.print(F(" and SCL on GPIO"));
-    Serial.println(SCL);
-    Wire.begin(SDA,SCL);
-  #else
-    Serial.println(F("Using default I2C pins: SDA on GPIO4 and SCL on GPIO5"));
-    Wire.begin();
-  #endif
+#if defined(SDA) && defined(SCL)
+  Serial.print(F("Using custom I2C pins: SDA on GPIO"));
+  Serial.print(SDA);
+  Serial.print(F(" and SCL on GPIO"));
+  Serial.println(SCL);
+  Wire.begin(SDA, SCL);
+#else
+  Serial.println(F("Using default I2C pins: SDA on GPIO4 and SCL on GPIO5"));
+  Wire.begin();
+#endif
   if (!bme.begin(BME280_ADDRESS)) {
     Serial.println(F("Could not find a valid BME280 sensor, check wiring or I2C address!"));
     while (1) {
@@ -379,7 +379,7 @@ int sample(float pressure)
   {
     forecast = SUNNY;
   }
-  else if ((dP_dt >(-0.05)) && (dP_dt < 0.05))
+  else if ((dP_dt > (-0.05)) && (dP_dt < 0.05))
   {
     forecast = STABLE;
   }
@@ -393,7 +393,7 @@ int sample(float pressure)
   Serial.print(minuteCount);
   Serial.print(F(" dP/dt = "));
   Serial.print(dP_dt);
-  Serial.print(F("kPa/h --> ")); 
+  Serial.print(F("kPa/h --> "));
   Serial.println(weatherStrings[forecast]);
 
   return forecast;
@@ -408,8 +408,8 @@ bool updatePressureSensor()
   float humidity = bme.readHumidity();
   float pressure_local = bme.readPressure() / 100.0; // Read atmospheric pressure at local altitude
   float pressure = ( pressure_local / pow((1.0 - ( ALTITUDE / 44330.0 )), 5.255)); // Local pressure adjusted to sea level pressure using user altitude
-  
-  if (!metric) 
+
+  if (!metric)
   {
     // Convert to fahrenheit
     temperature = temperature * 9.0 / 5.0 + 32.0;
@@ -486,7 +486,7 @@ bool updatePressureSensor()
       lastSituation = -1.0;
     }
   }
-  
+
   return changed;
 }
 
@@ -500,7 +500,7 @@ void setup() {
 
 void presentation() {
   // Present locally attached sensors
-  
+
   // Send the sketch version information to the gateway and Controller
   sendSketchInfo("Weather Station Gateway", "1.6");
 
@@ -516,3 +516,4 @@ void loop() {
   updatePressureSensor();
   wait(SLEEP_TIME);   // do not use sleep() or delay(), it would prevent required TCP/IP and MySensor operations!
 }
+
