@@ -84,7 +84,7 @@
 #include <ESP8266WiFi.h>
 #endif
 
-#include <MySensor.h>
+#include <MySensors.h>
 
 // ----------------------------------------------------------------------------
 // Child sensor ids
