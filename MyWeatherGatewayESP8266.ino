@@ -128,6 +128,9 @@ const bool SEND_ALWAYS = true;
 // You should not need to edit anything after this line //
 //////////////////////////////////////////////////////////
 
+#define SN "Weather Station Gateway"        // Name of the sketch
+#define SV "2.1.1"                          // Version (2.x : use MySensors 2.x)
+
 // Constant for the world wide average pressure
 const float SEALEVEL_PRESSURE = 1013.25;
 
@@ -494,7 +497,7 @@ bool updatePressureSensor()
 void setup() {
   // Setup locally attached sensors
   initPressureSensor();
-  metric = getConfig().isMetric;
+  metric = getControllerConfig().isMetric;  // was getConfig().isMetric; before MySensors v2.1.1
 }
 
 
@@ -502,7 +505,7 @@ void presentation() {
   // Present locally attached sensors
 
   // Send the sketch version information to the gateway and Controller
-  sendSketchInfo("Weather Station Gateway", "1.6");
+  sendSketchInfo(SN, SV);
 
   // Register sensors to gw (they will be created as child devices)
   present(BARO_CHILD, S_BARO);
